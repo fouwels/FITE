@@ -21,16 +21,17 @@ namespace fite
 		[DllImport("USER32.DLL")]
 		public static extern bool SetForegroundWindow(IntPtr hWnd);
 
-		private static Models.PlayersCurrentMoveDataModel _playersCurrentMoveDataModel;
+		private static Models.PlayersCurrentMoveDataModel _playerMoveSetsBuffer;
 
 		private static IntPtr AppHandle;
+		public static bool isDoubled = false;
 
 		static void Main(string[] args)
 		{
 			//**init**
-			_playersCurrentMoveDataModel = new Models.PlayersCurrentMoveDataModel();
-			_playersCurrentMoveDataModel.Blue = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
-			_playersCurrentMoveDataModel.Red = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
+			_playerMoveSetsBuffer = new Models.PlayersCurrentMoveDataModel();
+			_playerMoveSetsBuffer.Blue = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
+			_playerMoveSetsBuffer.Red = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
 
 			//**Patch debug into console**
 			var writer = new TextWriterTraceListener(System.Console.Out);
@@ -56,17 +57,87 @@ namespace fite
 				//var key = Console.ReadLine();
 				//EnterKeys(new List<string> {key, key, key, key, key, key});
 				
-				Console.WriteLine("enter to start test crap");
-				Console.ReadLine();
-				Debug.WriteLine("testing sync");
-				SyncKeyTesting();
-				Debug.WriteLine("done testing sync");
+				//Console.WriteLine("enter to start test crap");
+				//Console.ReadLine();
+				//Debug.WriteLine("testing sync");
+				//SyncKeyTesting();
+				//Debug.WriteLine("done testing sync");
 
 				//if (_playersCurrentMoveDataModel.Blue.Count > 0 && _playersCurrentMoveDataModel.Red.Count > 0)
 				//{
 				//	PlayMoves(_playersCurrentMoveDataModel.Red.First());
 				//	PlayMoves(_playersCurrentMoveDataModel.Blue.First());
 				//}
+
+				if (_playerMoveSetsBuffer.Blue.Count > 0 && _playerMoveSetsBuffer.Red.Count > 0)
+				{
+					var keypressBufferBlue = new List<string>();
+					var keypressBufferRed = new List<string>();
+					var keypressBufferMashed = new List<string>();
+
+					var currentMoveSetBlue = _playerMoveSetsBuffer.Blue[0];
+					var currentMoveSetRed = _playerMoveSetsBuffer.Red[0];
+					foreach (var Move in currentMoveSetBlue.Moves)
+					{
+						foreach (var key in Move.Keypresses)
+						{
+							keypressBufferBlue.Add(key);	
+						}
+					}
+					foreach (var Move in currentMoveSetRed.Moves)
+					{
+						foreach (var key in Move.Keypresses)
+						{
+							keypressBufferRed.Add(key);
+						}
+					}
+					try
+					{ //who needs linq merges?
+						keypressBufferMashed.Add(keypressBufferBlue[0]);
+						keypressBufferMashed.Add(keypressBufferRed[0]);
+						keypressBufferMashed.Add(keypressBufferBlue[1]);
+						keypressBufferMashed.Add(keypressBufferRed[1]);
+						keypressBufferMashed.Add(keypressBufferBlue[2]);
+						keypressBufferMashed.Add(keypressBufferRed[2]);
+						keypressBufferMashed.Add(keypressBufferBlue[3]);
+						keypressBufferMashed.Add(keypressBufferRed[3]);
+						keypressBufferMashed.Add(keypressBufferBlue[4]);
+						keypressBufferMashed.Add(keypressBufferRed[4]);
+						keypressBufferMashed.Add(keypressBufferBlue[5]);
+						keypressBufferMashed.Add(keypressBufferRed[5]);
+						keypressBufferMashed.Add(keypressBufferBlue[6]);
+						keypressBufferMashed.Add(keypressBufferRed[6]);
+						keypressBufferMashed.Add(keypressBufferBlue[7]);
+						keypressBufferMashed.Add(keypressBufferRed[7]);
+						keypressBufferMashed.Add(keypressBufferBlue[8]);
+						keypressBufferMashed.Add(keypressBufferRed[8]);
+						keypressBufferMashed.Add(keypressBufferBlue[9]);
+						keypressBufferMashed.Add(keypressBufferRed[9]);
+						keypressBufferMashed.Add(keypressBufferBlue[10]);
+						keypressBufferMashed.Add(keypressBufferRed[10]);
+						keypressBufferMashed.Add(keypressBufferBlue[11]);
+						keypressBufferMashed.Add(keypressBufferRed[11]);
+						keypressBufferMashed.Add(keypressBufferBlue[12]);
+						keypressBufferMashed.Add(keypressBufferRed[12]);
+						keypressBufferMashed.Add(keypressBufferBlue[13]);
+						keypressBufferMashed.Add(keypressBufferRed[13]);
+						keypressBufferMashed.Add(keypressBufferBlue[14]);
+						keypressBufferMashed.Add(keypressBufferRed[14]);
+						keypressBufferMashed.Add(keypressBufferBlue[15]);
+						keypressBufferMashed.Add(keypressBufferRed[15]);
+						keypressBufferMashed.Add(keypressBufferBlue[16]);
+						keypressBufferMashed.Add(keypressBufferRed[16]);
+						keypressBufferMashed.Add(keypressBufferBlue[17]);
+						keypressBufferMashed.Add(keypressBufferRed[17]);
+					}
+					catch (Exception)
+					{
+					}
+					EnterKeys(keypressBufferMashed);
+					_playerMoveSetsBuffer = new Models.PlayersCurrentMoveDataModel();
+					_playerMoveSetsBuffer.Blue = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
+					_playerMoveSetsBuffer.Red = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
+				}
 			}
 
 
@@ -102,33 +173,37 @@ namespace fite
 
 			var request = context.Request;
 			//handle request
-
 			//testing -> append mock data
 			var mdata = Services.MockMoveSetsRedBlue();
-			_playersCurrentMoveDataModel.Blue.AddRange(mdata.Blue);
-			_playersCurrentMoveDataModel.Red.AddRange(mdata.Red);
+			_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
+			_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
+			_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
+			_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
+			_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
+			_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
+
+
 			//////testing///////////
 
 
 			//yolo recursion
 			listener.BeginGetContext(WebCallback, listener);
-
-		}
-		static async void PlayMoves(Models.PlayersCurrentMoveDataModel.MoveSet MoveSet)
-		{
-			if (MoveSet.Moves.Count != 0)
-			{
-				var currentMove = MoveSet.Moves[0];
-				await EnterKeys(currentMove.Keypresses);
-				MoveSet.Moves.RemoveAt(0);
-				var timer = new System.Timers.Timer
-				{
-					Interval = 1000
-				};
-				timer.Elapsed += (sender, args) => PlayMoves(MoveSet);
-			}
 		}
 
+		//static async void PlayMoves(Models.PlayersCurrentMoveDataModel.MoveSet MoveSet)
+		//{
+		//	if (MoveSet.Moves.Count != 0)
+		//	{
+		//		var currentMove = MoveSet.Moves[0];
+		//		await EnterKeys(currentMove.Keypresses);
+		//		MoveSet.Moves.RemoveAt(0);
+		//		var timer = new System.Timers.Timer
+		//		{
+		//			Interval = 1000
+		//		};
+		//		timer.Elapsed += (sender, args) => PlayMoves(MoveSet);
+		//	}
+		//}
 		static void SyncKeyTesting()
 		{
 			var keys = new List<string>
@@ -145,24 +220,43 @@ namespace fite
 			};
 			EnterKeys(keys);
 		}
-		static async Task EnterKeys(List<String> keys)
+		//static void EnterKeys(List<String> keys)
+		//{
+		//	if (keys.Count != 0)
+		//	{
+		//		var currentkey = keys[0];
+		//		SendKeyPress(currentkey);
+		//		keys.RemoveAt(0);
+		//		var timer = new System.Timers.Timer
+		//		{
+		//			Interval = 4000
+		//		};
+		//		timer.Elapsed += (sender, args) => EnterKeys(keys);
+		//	}
+
+		//}
+		static void EnterKeys(List<String> keys)
 		{
 			if (keys.Count != 0)
 			{
 				var currentkey = keys[0];
 				SendKeyPress(currentkey);
-				await SendKeyPress(currentkey);
 				keys.RemoveAt(0);
-				var timer = new System.Timers.Timer
+				if (isDoubled)
 				{
-					Interval = 4000
-				};
-				timer.Elapsed += (sender, args) => EnterKeys(keys);
+					Thread.Sleep(2000);
+					isDoubled = false;
+				}
+				else
+				{
+					isDoubled = true;
+				}
+				EnterKeys(keys);
 			}
 
 		}
 
-		async static Task SendKeyPress(string key)
+		static void SendKeyPress(string key)
 		{
 			Debug.WriteLine("Sending" + key + " @" + DateTime.Now.TimeOfDay.Milliseconds);
 			SetForegroundWindow(AppHandle);

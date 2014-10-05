@@ -15,8 +15,6 @@ namespace fite
 
 			public class MoveSet
 			{
-				public string Name { get; set; }
-
 				public List<Move> Moves { get; set; }
 
 				public class Move

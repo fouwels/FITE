@@ -22,7 +22,7 @@ namespace fite
 							hasBeenExecuted = false,
 							Keypresses = new List<string>
 							{
-								"1"
+								"7"
 							}
 						},
 						new Models.PlayersCurrentMoveDataModel.MoveSet.Move
@@ -30,7 +30,7 @@ namespace fite
 							hasBeenExecuted = false,
 							Keypresses = new List<string>
 							{
-								"1"
+								"3"
 							}
 						},
 						new Models.PlayersCurrentMoveDataModel.MoveSet.Move
@@ -38,7 +38,31 @@ namespace fite
 							hasBeenExecuted = false,
 							Keypresses = new List<string>
 							{
-								"1"
+								"W"
+							}
+						},
+						new Models.PlayersCurrentMoveDataModel.MoveSet.Move
+						{
+							hasBeenExecuted = false,
+							Keypresses = new List<string>
+							{
+								"C"
+							}
+						},
+						new Models.PlayersCurrentMoveDataModel.MoveSet.Move
+						{
+							hasBeenExecuted = false,
+							Keypresses = new List<string>
+							{
+								"D"
+							}
+						},
+						new Models.PlayersCurrentMoveDataModel.MoveSet.Move
+						{
+							hasBeenExecuted = false,
+							Keypresses = new List<string>
+							{
+								"3"
 							}
 						},
 					}
@@ -55,7 +79,7 @@ namespace fite
 							hasBeenExecuted = false,
 							Keypresses = new List<string>
 							{
-								"9"
+								"C"
 							}
 						},
 						new Models.PlayersCurrentMoveDataModel.MoveSet.Move
@@ -63,7 +87,7 @@ namespace fite
 							hasBeenExecuted = false,
 							Keypresses = new List<string>
 							{
-								"9"
+								"x"
 							}
 						},
 						new Models.PlayersCurrentMoveDataModel.MoveSet.Move
@@ -71,9 +95,43 @@ namespace fite
 							hasBeenExecuted = false,
 							Keypresses = new List<string>
 							{
-								"9"
+								"C"
 							}
 						},
+						new Models.PlayersCurrentMoveDataModel.MoveSet.Move
+						{
+							hasBeenExecuted = false,
+							Keypresses = new List<string>
+							{
+								"C"
+							}
+
+						},
+						new Models.PlayersCurrentMoveDataModel.MoveSet.Move
+						{
+							hasBeenExecuted = false,
+							Keypresses = new List<string>
+							{
+								"Z"
+							}
+						},
+						new Models.PlayersCurrentMoveDataModel.MoveSet.Move
+						{
+							hasBeenExecuted = false,
+							Keypresses = new List<string>
+							{
+								"C"
+							}
+						},
+						new Models.PlayersCurrentMoveDataModel.MoveSet.Move
+						{
+							hasBeenExecuted = false,
+							Keypresses = new List<string>
+							{
+								"X"
+							}
+						},
+
 					}
 				}
 			};
