@@ -125,7 +125,7 @@ namespace fite
 				}
 
 
-				if (_playerMoveSetsBuffer.Blue.Count > 2 && _playerMoveSetsBuffer.Red.Count > 2)
+				if (_playerMoveSetsBuffer.Blue.Count > 5 && _playerMoveSetsBuffer.Red.Count > 5)
 				{
 					Console.SetCursorPosition(0,0);
 					Console.WriteLine("**FIGHT**                    ");
