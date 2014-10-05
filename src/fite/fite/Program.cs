@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -9,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using Newtonsoft.Json;
 using Timer = System.Windows.Forms.Timer;
 
 namespace fite
@@ -16,7 +18,7 @@ namespace fite
 	class Program
 	{
 		[DllImport("USER32.DLL", CharSet = CharSet.Unicode)]
-		public static extern IntPtr FindWindow(string lpClassName,string lpWindowName);
+		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
 		[DllImport("USER32.DLL")]
 		public static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -26,17 +28,30 @@ namespace fite
 		private static IntPtr AppHandle;
 		public static bool isDoubled = false;
 
-		static void Main(string[] args)
+		private static Random rnd = new Random();
+
+		private static void Main(string[] args)
 		{
+			MainSequence();
+			while (true)
+			{
+
+			}
+		}
+
+		static async void MainSequence()
+		{
+
 			//**init**
 			_playerMoveSetsBuffer = new Models.PlayersCurrentMoveDataModel();
 			_playerMoveSetsBuffer.Blue = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
 			_playerMoveSetsBuffer.Red = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
+			await HttpGet("http://bounce22.azurewebsites.net/home/clear");
 
 			//**Patch debug into console**
 			var writer = new TextWriterTraceListener(System.Console.Out);
 			Debug.Listeners.Add(writer);
-		
+
 			//**get handle**
 			AppHandle = FindWindow("SSFIVAE", "SSFIVAE");
 			//IntPtr calculatorHandle = FindWindow("Notepad", "Untitled - Notepad");
@@ -45,43 +60,86 @@ namespace fite
 				Debug.WriteLine("Handle not found");
 			}
 
-			//**start listener** [recursive hue]
-			WebListener(new List<string>
-			{
-				"http://localhost:1338/fite/"
-				//"https://yolo.localtunnel.me:443/"
-			});
-
 			while (true)
 			{
-				//var key = Console.ReadLine();
-				//EnterKeys(new List<string> {key, key, key, key, key, key});
-				
-				//Console.WriteLine("enter to start test crap");
-				//Console.ReadLine();
-				//Debug.WriteLine("testing sync");
-				//SyncKeyTesting();
-				//Debug.WriteLine("done testing sync");
-
-				//if (_playersCurrentMoveDataModel.Blue.Count > 0 && _playersCurrentMoveDataModel.Red.Count > 0)
-				//{
-				//	PlayMoves(_playersCurrentMoveDataModel.Red.First());
-				//	PlayMoves(_playersCurrentMoveDataModel.Blue.First());
-				//}
-
-				if (_playerMoveSetsBuffer.Blue.Count > 0 && _playerMoveSetsBuffer.Red.Count > 0)
+				var dataString = await HttpGet("http://bounce22.azurewebsites.net/home/");
+				var responses = JsonConvert.DeserializeObject<List<String>>(dataString);
+				if(dataString != "[]")
 				{
+					await HttpGet("http://bounce22.azurewebsites.net/home/clear");
+
+					foreach (var response in responses)
+					{
+						var movesConverted = new Models.PlayersCurrentMoveDataModel.MoveSet();
+						movesConverted.Moves = new List<Models.PlayersCurrentMoveDataModel.MoveSet.Move>();
+						var moves = response.Split(',');
+						if (moves[0].ToLower().Contains("left"))
+						{
+							foreach (var move in moves)
+							{
+								try
+								{
+									movesConverted.Moves.Add(
+										new Models.PlayersCurrentMoveDataModel.MoveSet.Move
+										{
+											hasBeenExecuted = false,
+											Keypresses = new List<string>
+											{
+												KvPs.Blue[move.Trim().ToUpper()]
+											}
+										});
+								}
+								catch (Exception)
+								{
+
+								}
+
+							}
+							_playerMoveSetsBuffer.Blue.Add(movesConverted);
+
+						}
+						else
+						{
+							foreach (var move in moves)
+							{
+								try
+								{
+									movesConverted.Moves.Add(
+										new Models.PlayersCurrentMoveDataModel.MoveSet.Move
+										{
+											hasBeenExecuted = false,
+											Keypresses = new List<string>
+											{
+												KvPs.Red[move.Trim().ToUpper()]
+											}
+										});
+								}
+								catch (Exception)
+								{
+
+								}
+							}
+							_playerMoveSetsBuffer.Red.Add(movesConverted);
+						}
+					}
+				}
+
+
+				if (_playerMoveSetsBuffer.Blue.Count > 2 && _playerMoveSetsBuffer.Red.Count > 2)
+				{
+					Console.SetCursorPosition(0,0);
+					Console.WriteLine("**FIGHT**                    ");
 					var keypressBufferBlue = new List<string>();
 					var keypressBufferRed = new List<string>();
 					var keypressBufferMashed = new List<string>();
-
-					var currentMoveSetBlue = _playerMoveSetsBuffer.Blue[0];
-					var currentMoveSetRed = _playerMoveSetsBuffer.Red[0];
+					
+					var currentMoveSetBlue = _playerMoveSetsBuffer.Blue.ElementAt(rnd.Next(1, _playerMoveSetsBuffer.Blue.Count()));
+					var currentMoveSetRed = _playerMoveSetsBuffer.Red.ElementAt(rnd.Next(1, _playerMoveSetsBuffer.Blue.Count()));
 					foreach (var Move in currentMoveSetBlue.Moves)
 					{
 						foreach (var key in Move.Keypresses)
 						{
-							keypressBufferBlue.Add(key);	
+							keypressBufferBlue.Add(key);
 						}
 					}
 					foreach (var Move in currentMoveSetRed.Moves)
@@ -92,7 +150,11 @@ namespace fite
 						}
 					}
 					try
-					{ //who needs linq merges?
+					{
+						//who needs linq merges?
+
+						#region mash
+
 						keypressBufferMashed.Add(keypressBufferBlue[0]);
 						keypressBufferMashed.Add(keypressBufferRed[0]);
 						keypressBufferMashed.Add(keypressBufferBlue[1]);
@@ -129,66 +191,88 @@ namespace fite
 						keypressBufferMashed.Add(keypressBufferRed[16]);
 						keypressBufferMashed.Add(keypressBufferBlue[17]);
 						keypressBufferMashed.Add(keypressBufferRed[17]);
+
+						#endregion
 					}
 					catch (Exception)
 					{
 					}
 					EnterKeys(keypressBufferMashed);
-					_playerMoveSetsBuffer = new Models.PlayersCurrentMoveDataModel();
-					_playerMoveSetsBuffer.Blue = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
-					_playerMoveSetsBuffer.Red = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
+					//_playerMoveSetsBuffer = new Models.PlayersCurrentMoveDataModel();
+					//_playerMoveSetsBuffer.Blue = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
+					//_playerMoveSetsBuffer.Red = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
 				}
+				else
+				{
+					Console.SetCursorPosition(0,0);
+					Console.WriteLine("**Response quota not met**");
+				}
+				Console.SetCursorPosition(0, 2);
+				Console.WriteLine("Move Sequences in buffer:");
+				Console.WriteLine("   LEFT: " + _playerMoveSetsBuffer.Blue.Count);
+				Console.WriteLine("   RIGHT: " + _playerMoveSetsBuffer.Red.Count);
 			}
-
-
 		}
-
-		static async Task WebListener(List<string> prefixes)
+		public static async Task<string> HttpGet(string urlIn)
 		{
-			var listener = new HttpListener();
-			foreach (var s in prefixes)
-			{
-				listener.Prefixes.Add(s);
-			}
-			listener.Start();
-			listener.BeginGetContext(WebCallback, listener); //down the rabbit hole
-			//listener.Stop();	
+			var request = (HttpWebRequest)WebRequest.Create(urlIn);
+			request.Accept = "application/json";
+
+			WebResponse response = await request.GetResponseAsync();
+			string temp;
+
+			using (Stream stream = response.GetResponseStream())
+			using (var reader = new StreamReader(stream))
+				temp = reader.ReadToEnd();
+			return temp;
 		}
 
-		private static void WebCallback(IAsyncResult result)
-		{
-			Debug.WriteLine("callback");
-			var listener = (HttpListener) result.AsyncState;
-			var context = listener.EndGetContext(result);
-			var resp = context.Response;
+		//static async Task WebListener(List<string> prefixes)
+		//{
+		//	var listener = new HttpListener();
+		//	foreach (var s in prefixes)
+		//	{
+		//		listener.Prefixes.Add(s);
+		//	}
+		//	listener.Start();
+		//	listener.BeginGetContext(WebCallback, listener); //down the rabbit hole
+		//	//listener.Stop();	
+		//}
 
-			//response
-			string responseString = "<HTML><BODY>Ayyyyyo</BODY></HTML>";
-			byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
+		//private static void WebCallback(IAsyncResult result)
+		//{
+		//	Debug.WriteLine("callback");
+		//	var listener = (HttpListener) result.AsyncState;
+		//	var context = listener.EndGetContext(result);
+		//	var resp = context.Response;
 
-			resp.ContentLength64 = buffer.Length;
-			System.IO.Stream output = resp.OutputStream;
-			output.Write(buffer, 0, buffer.Length);
-			output.Close();
+		//	//response
+		//	string responseString = "<HTML><BODY>Ayyyyyo</BODY></HTML>";
+		//	byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
 
-			var request = context.Request;
-			//handle request
-			//testing -> append mock data
-			var mdata = Services.MockMoveSetsRedBlue();
-			_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
-			_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
-			_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
-			_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
-			_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
-			_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
+		//	resp.ContentLength64 = buffer.Length;
+		//	System.IO.Stream output = resp.OutputStream;
+		//	output.Write(buffer, 0, buffer.Length);
+		//	output.Close();
+
+		//	var request = context.Request;
+		//	//handle request
+		//	//testing -> append mock data
+		//	var mdata = Services.MockMoveSetsRedBlue();
+		//	_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
+		//	_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
+		//	_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
+		//	_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
+		//	_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
+		//	_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
 
 
-			//////testing///////////
+		//	//////testing///////////
 
 
-			//yolo recursion
-			listener.BeginGetContext(WebCallback, listener);
-		}
+		//	//yolo recursion
+		//	listener.BeginGetContext(WebCallback, listener);
+		//}
 
 		//static async void PlayMoves(Models.PlayersCurrentMoveDataModel.MoveSet MoveSet)
 		//{
@@ -244,7 +328,7 @@ namespace fite
 				keys.RemoveAt(0);
 				if (isDoubled)
 				{
-					Thread.Sleep(2000);
+					Thread.Sleep(1000);
 					isDoubled = false;
 				}
 				else
@@ -258,13 +342,15 @@ namespace fite
 
 		static void SendKeyPress(string key)
 		{
-			Debug.WriteLine("Sending" + key + " @" + DateTime.Now.TimeOfDay.Milliseconds);
+			Console.SetCursorPosition(0, 7);
+			Debug.WriteLine("Sending " + key + " @" + DateTime.Now.TimeOfDay.Milliseconds);
 			SetForegroundWindow(AppHandle);
 			for (int i = 0; i < 20; i++) //yolo
 			{
 				SendKeys.SendWait(key);
 			}
-			Debug.WriteLine("Sent?" + key + " @" + DateTime.Now.TimeOfDay.Milliseconds);
+			Console.SetCursorPosition(0, 8);
+			Debug.WriteLine("Sent " + key + " @" + DateTime.Now.TimeOfDay.Milliseconds);
 		}
 	}
 }
