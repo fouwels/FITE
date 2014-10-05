@@ -1,0 +1,6 @@
+C:\Data\MHL\src\fite\fite\bin\Debug\fite.exe.config
+C:\Data\MHL\src\fite\fite\bin\Debug\fite.exe
+C:\Data\MHL\src\fite\fite\bin\Debug\fite.pdb
+C:\Data\MHL\src\fite\fite\obj\Debug\fite.exe
+C:\Data\MHL\src\fite\fite\obj\Debug\fite.pdb
+C:\Data\MHL\src\fite\fite\obj\Debug\fite.csprojResolveAssemblyReference.cache

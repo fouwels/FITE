@@ -1,0 +1,34 @@
+--P1--
+UP - W
+Down - S
+Left - A
+Right - D
+
+LP - Z
+MP - X
+HP - C
+
+LK - V
+MK - B
+HK - N
+
+TH - Q
+
+--P2--
+
+UP - UP
+DOWN - DOWN
+LEFT - LEFT
+RIGHT - RIGHT
+
+LP - 1
+MP - 2
+HP - 3
+
+LK - 5
+MK - 6
+HK - 7
+
+TH - 8
+
+
