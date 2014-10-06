@@ -8,15 +8,21 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using fite;
 using Newtonsoft.Json;
 
 namespace fite
 {
-	class Program
+	internal class Program
 	{
 		private const int MinResponses = 1;
 		private const int KeyPressDelay = 1000;
+
+		private static Models.PlayersCurrentMoveDataModel _playerMoveSetsBuffer;
+
+		private static IntPtr AppHandle;
+		public static bool isDoubled = false;
+
+		private static readonly Random rnd = new Random();
 
 		[DllImport("USER32.DLL", CharSet = CharSet.Unicode)]
 		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -24,22 +30,16 @@ namespace fite
 		[DllImport("USER32.DLL")]
 		public static extern bool SetForegroundWindow(IntPtr hWnd);
 
-		private static Models.PlayersCurrentMoveDataModel _playerMoveSetsBuffer;
-
-		private static IntPtr AppHandle;
-		public static bool isDoubled = false;
-
-		private static Random rnd = new Random();
-
 		private static void Main(string[] args)
 		{
 			MainSequence(); //async
-			while (true){}
+			while (true)
+			{
+			}
 		}
 
-		static async void MainSequence()
+		private static async void MainSequence()
 		{
-
 			//**init**
 			_playerMoveSetsBuffer = new Models.PlayersCurrentMoveDataModel();
 			_playerMoveSetsBuffer.Blue = new List<Models.PlayersCurrentMoveDataModel.MoveSet>();
@@ -47,7 +47,7 @@ namespace fite
 			await HttpGet("http://bounce22.azurewebsites.net/home/clear");
 
 			//**Patch debug into console**
-			var writer = new TextWriterTraceListener(System.Console.Out);
+			var writer = new TextWriterTraceListener(Console.Out);
 			Debug.Listeners.Add(writer);
 
 			//**get handle**
@@ -60,20 +60,20 @@ namespace fite
 
 			while (true)
 			{
-				var dataString = await HttpGet("http://bounce22.azurewebsites.net/home/");
+				string dataString = await HttpGet("http://bounce22.azurewebsites.net/home/");
 				var responses = JsonConvert.DeserializeObject<List<String>>(dataString);
-				if(dataString != "[]")
+				if (dataString != "[]")
 				{
 					await HttpGet("http://bounce22.azurewebsites.net/home/clear");
 
-					foreach (var response in responses)
+					foreach (string response in responses)
 					{
 						var movesConverted = new Models.PlayersCurrentMoveDataModel.MoveSet();
 						movesConverted.Moves = new List<Models.PlayersCurrentMoveDataModel.MoveSet.Move>();
-						var moves = response.Split(',');
+						string[] moves = response.Split(',');
 						if (moves[0].ToLower().Contains("left"))
 						{
-							foreach (var move in moves)
+							foreach (string move in moves)
 							{
 								try
 								{
@@ -89,16 +89,13 @@ namespace fite
 								}
 								catch (Exception)
 								{
-
 								}
-
 							}
 							_playerMoveSetsBuffer.Blue.Add(movesConverted);
-
 						}
 						else
 						{
-							foreach (var move in moves)
+							foreach (string move in moves)
 							{
 								try
 								{
@@ -114,7 +111,6 @@ namespace fite
 								}
 								catch (Exception)
 								{
-
 								}
 							}
 							_playerMoveSetsBuffer.Red.Add(movesConverted);
@@ -125,24 +121,26 @@ namespace fite
 
 				if (_playerMoveSetsBuffer.Blue.Count > MinResponses && _playerMoveSetsBuffer.Red.Count > MinResponses)
 				{
-					Console.SetCursorPosition(0,0);
+					Console.SetCursorPosition(0, 0);
 					Console.WriteLine("**FIGHT**                    ");
 					var keypressBufferBlue = new List<string>();
 					var keypressBufferRed = new List<string>();
 					var keypressBufferMashed = new List<string>();
-					
-					var currentMoveSetBlue = _playerMoveSetsBuffer.Blue.ElementAt(rnd.Next(1, _playerMoveSetsBuffer.Blue.Count()));
-					var currentMoveSetRed = _playerMoveSetsBuffer.Red.ElementAt(rnd.Next(1, _playerMoveSetsBuffer.Blue.Count()));
-					foreach (var Move in currentMoveSetBlue.Moves)
+
+					Models.PlayersCurrentMoveDataModel.MoveSet currentMoveSetBlue =
+						_playerMoveSetsBuffer.Blue.ElementAt(rnd.Next(1, _playerMoveSetsBuffer.Blue.Count()));
+					Models.PlayersCurrentMoveDataModel.MoveSet currentMoveSetRed =
+						_playerMoveSetsBuffer.Red.ElementAt(rnd.Next(1, _playerMoveSetsBuffer.Blue.Count()));
+					foreach (Models.PlayersCurrentMoveDataModel.MoveSet.Move Move in currentMoveSetBlue.Moves)
 					{
-						foreach (var key in Move.Keypresses)
+						foreach (string key in Move.Keypresses)
 						{
 							keypressBufferBlue.Add(key);
 						}
 					}
-					foreach (var Move in currentMoveSetRed.Moves)
+					foreach (Models.PlayersCurrentMoveDataModel.MoveSet.Move Move in currentMoveSetRed.Moves)
 					{
-						foreach (var key in Move.Keypresses)
+						foreach (string key in Move.Keypresses)
 						{
 							keypressBufferRed.Add(key);
 						}
@@ -202,7 +200,7 @@ namespace fite
 				}
 				else
 				{
-					Console.SetCursorPosition(0,0);
+					Console.SetCursorPosition(0, 0);
 					Console.WriteLine("**Response quota not met**");
 				}
 				Console.SetCursorPosition(0, 2);
@@ -211,9 +209,10 @@ namespace fite
 				Console.WriteLine("   RIGHT: " + _playerMoveSetsBuffer.Red.Count);
 			}
 		}
+
 		public static async Task<string> HttpGet(string urlIn)
 		{
-			var request = (HttpWebRequest)WebRequest.Create(urlIn);
+			var request = (HttpWebRequest) WebRequest.Create(urlIn);
 			request.Accept = "application/json";
 
 			WebResponse response = await request.GetResponseAsync();
@@ -225,103 +224,11 @@ namespace fite
 			return temp;
 		}
 
-		//static async Task WebListener(List<string> prefixes)
-		//{
-		//	var listener = new HttpListener();
-		//	foreach (var s in prefixes)
-		//	{
-		//		listener.Prefixes.Add(s);
-		//	}
-		//	listener.Start();
-		//	listener.BeginGetContext(WebCallback, listener); //down the rabbit hole
-		//	//listener.Stop();	
-		//}
-
-		//private static void WebCallback(IAsyncResult result)
-		//{
-		//	Debug.WriteLine("callback");
-		//	var listener = (HttpListener) result.AsyncState;
-		//	var context = listener.EndGetContext(result);
-		//	var resp = context.Response;
-
-		//	//response
-		//	string responseString = "<HTML><BODY>Ayyyyyo</BODY></HTML>";
-		//	byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
-
-		//	resp.ContentLength64 = buffer.Length;
-		//	System.IO.Stream output = resp.OutputStream;
-		//	output.Write(buffer, 0, buffer.Length);
-		//	output.Close();
-
-		//	var request = context.Request;
-		//	//handle request
-		//	//testing -> append mock data
-		//	var mdata = Services.MockMoveSetsRedBlue();
-		//	_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
-		//	_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
-		//	_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
-		//	_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
-		//	_playerMoveSetsBuffer.Blue.AddRange(mdata.Blue);
-		//	_playerMoveSetsBuffer.Red.AddRange(mdata.Red);
-
-
-		//	//////testing///////////
-
-
-		//	//yolo recursion
-		//	listener.BeginGetContext(WebCallback, listener);
-		//}
-
-		//static async void PlayMoves(Models.PlayersCurrentMoveDataModel.MoveSet MoveSet)
-		//{
-		//	if (MoveSet.Moves.Count != 0)
-		//	{
-		//		var currentMove = MoveSet.Moves[0];
-		//		await EnterKeys(currentMove.Keypresses);
-		//		MoveSet.Moves.RemoveAt(0);
-		//		var timer = new System.Timers.Timer
-		//		{
-		//			Interval = 1000
-		//		};
-		//		timer.Elapsed += (sender, args) => PlayMoves(MoveSet);
-		//	}
-		//}
-		static void SyncKeyTesting()
-		{
-			var keys = new List<string>
-			{
-				"2",
-				"2",
-				"2",
-				"2",
-				"2",
-				"2",
-				"2",
-				"2",
-				"2"
-			};
-			EnterKeys(keys);
-		}
-		//static void EnterKeys(List<String> keys)
-		//{
-		//	if (keys.Count != 0)
-		//	{
-		//		var currentkey = keys[0];
-		//		SendKeyPress(currentkey);
-		//		keys.RemoveAt(0);
-		//		var timer = new System.Timers.Timer
-		//		{
-		//			Interval = 4000
-		//		};
-		//		timer.Elapsed += (sender, args) => EnterKeys(keys);
-		//	}
-
-		//}
-		static void EnterKeys(List<String> keys)
+		private static void EnterKeys(List<String> keys)
 		{
 			if (keys.Count != 0)
 			{
-				var currentkey = keys[0];
+				string currentkey = keys[0];
 				SendKeyPress(currentkey);
 				keys.RemoveAt(0);
 				if (isDoubled)
@@ -335,10 +242,9 @@ namespace fite
 				}
 				EnterKeys(keys);
 			}
-
 		}
 
-		static void SendKeyPress(string key)
+		private static void SendKeyPress(string key)
 		{
 			Console.SetCursorPosition(0, 7);
 			Debug.WriteLine("Sending " + key + " @" + DateTime.Now.TimeOfDay.Milliseconds);

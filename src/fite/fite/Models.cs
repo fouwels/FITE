@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace fite
 {
 	public class Models
 	{
+		public class MockDataViewmodel
+		{
+			public List<PlayersCurrentMoveDataModel.MoveSet> Red { get; set; }
+			public List<PlayersCurrentMoveDataModel.MoveSet> Blue { get; set; }
+		}
+
 		public class PlayersCurrentMoveDataModel
 		{
 			public List<MoveSet> Red { get; set; }
@@ -23,11 +25,6 @@ namespace fite
 					public List<string> Keypresses { get; set; }
 				}
 			}
-		}
-		public class MockDataViewmodel
-		{
-			public List<PlayersCurrentMoveDataModel.MoveSet> Red { get; set; }
-			public List<PlayersCurrentMoveDataModel.MoveSet> Blue { get; set; }
 		}
 	}
 }

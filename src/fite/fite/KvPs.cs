@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace fite
 {
@@ -10,33 +6,32 @@ namespace fite
 	{
 		public static Dictionary<string, string> Red = new Dictionary<string, string>
 		{
-			{"UP" , "W"},
+			{"UP", "W"},
 			{"DOWN", "S"},
-			{"LEFT" , "A"},
-			{"RIGHT" , "d"},
-			{"LP" , "Z"},
-			{"MP" , "X"},
-			{"HP" , "C"},
-			{"LK" , "V"},
-			{"MK" , "B"},
+			{"LEFT", "A"},
+			{"RIGHT", "d"},
+			{"LP", "Z"},
+			{"MP", "X"},
+			{"HP", "C"},
+			{"LK", "V"},
+			{"MK", "B"},
 			{"HK", "N"},
-			{"TH" , "Q"},
+			{"TH", "Q"},
 		};
+
 		public static Dictionary<string, string> Blue = new Dictionary<string, string>
 		{
-
-			{"UP" , "UP"},
+			{"UP", "UP"},
 			{"DOWN", "DOWN"},
-			{"LEFT" , "LEFT"},
-			{"RIGHT" , "RIGHT"},
-			{"LP" , "1"},
-			{"MP" , "2"},
-			{"HP" , "3"},
-			{"LK" , "5"},
-			{"MK" , "6"},
+			{"LEFT", "LEFT"},
+			{"RIGHT", "RIGHT"},
+			{"LP", "1"},
+			{"MP", "2"},
+			{"HP", "3"},
+			{"LK", "5"},
+			{"MK", "6"},
 			{"HK", "7"},
-			{"TH" , "8"}
-
+			{"TH", "8"}
 		};
-	}								
+	}
 }
