@@ -3,5 +3,5 @@ C:\Data\MHL\src\fite\fite\bin\Debug\fite.exe
 C:\Data\MHL\src\fite\fite\bin\Debug\fite.pdb
 C:\Data\MHL\src\fite\fite\obj\Debug\fite.exe
 C:\Data\MHL\src\fite\fite\obj\Debug\fite.pdb
-C:\Data\MHL\src\fite\fite\obj\Debug\fite.csprojResolveAssemblyReference.cache
 C:\Data\MHL\src\fite\fite\bin\Debug\Newtonsoft.Json.dll
+C:\Data\MHL\src\fite\fite\obj\Debug\fite.csprojResolveAssemblyReference.cache

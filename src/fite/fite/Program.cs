@@ -5,18 +5,19 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
+using fite;
 using Newtonsoft.Json;
-using Timer = System.Windows.Forms.Timer;
 
 namespace fite
 {
 	class Program
 	{
+		private const int MinResponses = 1;
+		private const int KeyPressDelay = 1000;
+
 		[DllImport("USER32.DLL", CharSet = CharSet.Unicode)]
 		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
@@ -32,11 +33,8 @@ namespace fite
 
 		private static void Main(string[] args)
 		{
-			MainSequence();
-			while (true)
-			{
-
-			}
+			MainSequence(); //async
+			while (true){}
 		}
 
 		static async void MainSequence()
@@ -125,7 +123,7 @@ namespace fite
 				}
 
 
-				if (_playerMoveSetsBuffer.Blue.Count > 5 && _playerMoveSetsBuffer.Red.Count > 5)
+				if (_playerMoveSetsBuffer.Blue.Count > MinResponses && _playerMoveSetsBuffer.Red.Count > MinResponses)
 				{
 					Console.SetCursorPosition(0,0);
 					Console.WriteLine("**FIGHT**                    ");
@@ -328,7 +326,7 @@ namespace fite
 				keys.RemoveAt(0);
 				if (isDoubled)
 				{
-					Thread.Sleep(1000);
+					Thread.Sleep(KeyPressDelay);
 					isDoubled = false;
 				}
 				else
